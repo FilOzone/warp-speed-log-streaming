@@ -35,7 +35,7 @@ echo -e "${GREEN}✓${NC} Client ID: $CLIENT_ID"
 
 # Step 2: Get Better Stack token
 echo
-read -p "Enter Better Stack token: " BETTER_STACK_TOKEN
+read -p "Enter Better Stack token: " BETTER_STACK_TOKEN < /dev/tty
 
 if [ -z "$BETTER_STACK_TOKEN" ]; then
     echo -e "${RED}Error: Better Stack token required${NC}"
