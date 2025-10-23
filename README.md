@@ -8,21 +8,22 @@ Stream your Curio PDP logs to Better Stack for easy debugging, monitoring, and c
 
 ## ⚠️ Important
 
-This logging infrastructure is set up to help maintainers and core team debug issues with new software being actively developed as part of Filecoin Onchain Clout. **This is NOT a white-glove support service for SPs.**
+This logging infrastructure is set up to help maintainers and the core filecoin onchain cloud working group debug issues with new software being actively developed as part of [Filecoin Onchain Cloud](https://filecoin.cloud/) (FOC). **This is NOT a white-glove support service for SPs.**
 
 **Intended Audience**: SPX SPs participating in the Warp Speed program and early SPs involved with getting FOC off the ground who are using the PDP Curio branch.
 
 ---
 
-## Getting Started
+## Prerequisites
 
-### Obtaining the Better Stack Token
+- **Better Stack token** - Contact the FilOz team in the **#fil-pdp** channel on Filecoin Slack to receive your Better Stack token. This token is shared among all Warp Speed participants and should not be publicly shared.
+- **Bash shell** (required for installer)
+- **Curio** running (systemd service or manual)
+- **Sudo access** (for installing Vector and configuring systemd)
+- **Your client ID** from the [Filecoin Service Registry](https://www.filecoin.services/providers)
 
-Contact the FilOz team in the **#fil-pdp** channel on Filecoin Slack to receive your Better Stack token. This token is shared among all Warp Speed participants and should not be publicly shared.
 
----
-
-## Quick Start
+## Install
 
 **One command to rule them all:**
 
@@ -38,27 +39,18 @@ The installer will prompt you for:
 
 ---
 
-## What It Does
+### What It Does
 
 The installer:
-1. ✓ Prompts for your client ID
-2. ✓ Prompts for Better Stack token
-3. ✓ Detects your deployment method (systemd vs manual)
-4. ✓ Sets up logging configuration (if manual)
-5. ✓ Installs Vector (if needed)
-6. ✓ Configures log streaming
-7. ✓ Starts the service
-8. ✓ Verifies everything works
+1. Prompts for your client ID
+2. Prompts for Better Stack token
+3. Detects your deployment method (systemd vs manual)
+4. Sets up logging configuration (if manual)
+5. Installs Vector (if needed)
+6. Configures log streaming
+7. Starts the service
+8. Verifies everything works
 
----
-
-## Prerequisites
-
-- **Bash shell** (required for installer)
-- **Curio** running (systemd service or manual)
-- **Sudo access** (for installing Vector and configuring systemd)
-- **Your client ID** from the [Filecoin Service Registry](https://www.filecoin.services/providers)
-- **Better Stack token** (provided by maintainer)
 
 ### Deployment Methods
 
@@ -156,7 +148,7 @@ sudo systemctl restart vector
 
 ---
 
-## Uninstalling
+## Uninstall
 
 To remove Vector and stop log streaming:
 
@@ -184,7 +176,7 @@ Better Stack (centralized logs)
 1. Curio writes JSON logs to file
 2. Vector tails the file
 3. Parses JSON and adds client_id
-4. Batches 100 events or 1 second
+4. Batches 1000 events or 10 seconds (see [vector.yaml](vector.yaml))
 5. Compresses with gzip
 6. POSTs to Better Stack
 
@@ -203,7 +195,7 @@ Key settings:
 - **Source**: Tails your curio.log file
 - **Transform**: Parses JSON, adds client_id and platform fields
 - **Sink**: Sends to Better Stack via HTTP
-- **Batching**: 100 events or 1 second (whichever comes first)
+- **Batching**: 1000 events or 10 seconds (whichever comes first) - see [vector.yaml](vector.yaml) for details
 
 ---
 
@@ -230,7 +222,7 @@ We take privacy seriously. The logging system:
 **Issues or questions?**
 
 - File an issue: [GitHub Issues](https://github.com/FilOzone/warp-speed-log-streaming/issues)
-- Contact PDP maintainer with:
+- Contact PDP maintainers in [#fil-pdp] with:
   - Your client ID
   - Output of `sudo systemctl status vector`
   - Recent logs: `sudo journalctl -u vector -n 100`
@@ -242,7 +234,7 @@ We take privacy seriously. The logging system:
 - **Better Stack Dashboard**: https://s1560290.eu-nbg-2.betterstackdata.com (access limited to working group/maintainers)
 - **Vector Docs**: https://vector.dev/docs/
 - **Curio PDP Docs**: https://docs.curiostorage.org/experimental-features/enable-pdp
-- **Filecoin Service Registry**: https://www.filecoin.services/providers
+- **Filecoin Service Registry**: https://filecoin.services/providers
 
 ---
 

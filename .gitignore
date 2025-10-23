@@ -1,0 +1,25 @@
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+.claude/
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
+
+# Test output
+vector-status.txt
+vector-logs.txt
+vector-config.txt
+permissions.txt
