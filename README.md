@@ -6,6 +6,14 @@ Stream your Curio PDP logs to Better Stack for easy debugging, monitoring, and c
 
 ---
 
+## ⚠️ Important
+
+This logging infrastructure is set up to help maintainers and core team debug issues with new software being actively developed as part of Filecoin Onchain Clout. **This is NOT a white-glove support service for SPs.**
+
+**Intended Audience**: SPX SPs participating in the Warp Speed program and early SPs involved with getting FOC off the ground who are using the PDP Curio branch.
+
+---
+
 ## Quick Start
 
 **One command to rule them all:**
@@ -15,7 +23,7 @@ curl -sSL https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/ma
 ```
 
 The installer will prompt you for:
-- Your client ID (from Filecoin Service Registry, e.g., `ezpdpz-calib`)
+- Your client ID (from Filecoin Service Registry, e.g., `YOUR_CLIENT_ID="ezpdpz-calib"`)
 - Better Stack token (provided by maintainer)
 
 **Time:** ~30-60 seconds
@@ -38,9 +46,10 @@ The installer:
 
 ## Prerequisites
 
+- **Bash shell** (required for installer)
 - **Curio** running (systemd service or manual)
 - **Sudo access** (for installing Vector and configuring systemd)
-- **Your client ID** from the Filecoin Service Registry
+- **Your client ID** from the [Filecoin Service Registry](https://github.com/filecoin-project/filecoin-service-registry)
 - **Better Stack token** (provided by maintainer)
 
 ### Deployment Methods
@@ -88,27 +97,7 @@ sudo journalctl -u vector -f
 
 Logs appear in the Better Stack dashboard within ~1 minute.
 
-Filter by your client ID: `client_id:"your-client-id"`
-
----
-
-## Manual Installation
-
-If you prefer to review before running:
-
-1. **Download and review the install script:**
-   ```bash
-   curl -sSL https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/main/install.sh -o install.sh
-   chmod +x install.sh
-   cat install.sh  # Review it
-   ```
-
-2. **Run it:**
-   ```bash
-   ./install.sh
-   ```
-
-   The script will prompt you for your client ID and Better Stack token.
+Filter by your client ID: `client_id:"$YOUR_CLIENT_ID"`
 
 ---
 
@@ -218,6 +207,16 @@ Key settings:
 
 ---
 
+## Privacy & Data Protection
+
+We take privacy seriously. The logging system:
+- **Filters hostname** from logs (though already in public registry)
+- **Filters filepath** information
+- **Does not track or store IP addresses**
+- **Dashboard access** limited to working group/maintainers only (not public)
+
+---
+
 ## Support
 
 **Issues or questions?**
@@ -232,9 +231,10 @@ Key settings:
 
 ## Related
 
-- **Better Stack Dashboard**: https://s1560290.eu-nbg-2.betterstackdata.com
+- **Better Stack Dashboard**: https://s1560290.eu-nbg-2.betterstackdata.com (access limited to working group/maintainers)
 - **Vector Docs**: https://vector.dev/docs/
 - **Curio PDP Docs**: https://docs.filecoin.io/storage-providers/pdp/
+- **Filecoin Service Registry**: https://github.com/filecoin-project/filecoin-service-registry
 
 ---
 
