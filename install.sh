@@ -1,0 +1,199 @@
+#!/bin/bash
+set -e
+
+# Warp Speed Log Streaming - Curio PDP to Better Stack
+# One-command installer for SP logging setup
+
+REPO_URL="https://raw.githubusercontent.com/filecoin-project/warp-speed-log-streaming/main"
+CLIENT_ID="$1"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo "=========================================="
+echo "  Warp Speed Log Streaming Installer"
+echo "  Curio PDP → Better Stack"
+echo "=========================================="
+echo
+
+# Step 1: Validate input
+if [ -z "$CLIENT_ID" ]; then
+    echo -e "${RED}Error: Client ID required${NC}"
+    echo
+    echo "Usage:"
+    echo "  curl -sSL $REPO_URL/install.sh | bash -s \"your-client-id\""
+    echo
+    echo "Example:"
+    echo "  curl -sSL $REPO_URL/install.sh | bash -s \"ezpdpz-calib\""
+    exit 1
+fi
+
+echo -e "${GREEN}✓${NC} Client ID: $CLIENT_ID"
+
+# Step 2: Get Better Stack token
+echo
+read -p "Enter Better Stack token: " BETTER_STACK_TOKEN
+
+if [ -z "$BETTER_STACK_TOKEN" ]; then
+    echo -e "${RED}Error: Better Stack token required${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✓${NC} Token received"
+
+# Step 3: Detect deployment method and setup logging
+echo
+echo "Detecting Curio deployment method..."
+LOG_PATH="/var/log/curio/curio.log"
+
+# Check if running as systemd service
+if systemctl is-active --quiet curio 2>/dev/null; then
+    echo -e "${GREEN}✓${NC} Curio is running as systemd service"
+
+    # Verify log file exists
+    if [ ! -f "$LOG_PATH" ]; then
+        echo -e "${RED}Error: $LOG_PATH not found${NC}"
+        echo "Your systemd service should create this file automatically."
+        echo "Check your service configuration: sudo systemctl status curio"
+        exit 1
+    fi
+
+    echo -e "${GREEN}✓${NC} Found curio.log: $LOG_PATH"
+
+else
+    echo -e "${YELLOW}⚠${NC}  Curio is not running as systemd service (manual deployment)"
+
+    # Create log directory if it doesn't exist
+    if [ ! -d "/var/log/curio" ]; then
+        echo "Creating /var/log/curio directory..."
+        sudo mkdir -p /var/log/curio
+        sudo chown $USER:$USER /var/log/curio
+        sudo chmod 755 /var/log/curio
+        echo -e "${GREEN}✓${NC} Created /var/log/curio"
+    fi
+
+    # Check if environment variables are set in bashrc
+    if ! grep -q "GOLOG_OUTPUT.*file" ~/.bashrc 2>/dev/null; then
+        echo
+        echo "Adding log environment variables to ~/.bashrc..."
+        echo "" >> ~/.bashrc
+        echo "# Curio logging configuration (added by warp-speed-log-streaming)" >> ~/.bashrc
+        echo "export GOLOG_OUTPUT=\"file+stdout\"" >> ~/.bashrc
+        echo "export GOLOG_FILE=\"/var/log/curio/curio.log\"" >> ~/.bashrc
+        echo "export GOLOG_LOG_FMT=\"json\"" >> ~/.bashrc
+        echo -e "${GREEN}✓${NC} Added environment variables to ~/.bashrc"
+        echo
+        echo -e "${YELLOW}⚠${NC}  IMPORTANT: You must restart Curio for logging changes to take effect:"
+        echo "   source ~/.bashrc"
+        echo "   Then restart your Curio process"
+    else
+        echo -e "${GREEN}✓${NC} Log environment variables already configured"
+    fi
+
+    # Create empty log file if it doesn't exist
+    if [ ! -f "$LOG_PATH" ]; then
+        touch "$LOG_PATH"
+        chmod 644 "$LOG_PATH"
+        echo -e "${GREEN}✓${NC} Created empty log file (will be populated when Curio starts)"
+    else
+        echo -e "${GREEN}✓${NC} Found existing curio.log"
+    fi
+fi
+
+# Verify log format if file has content
+if [ -f "$LOG_PATH" ] && [ -s "$LOG_PATH" ]; then
+    if ! head -1 "$LOG_PATH" | grep -q "^{"; then
+        echo -e "${YELLOW}⚠${NC}  Warning: Log file doesn't appear to be JSON formatted"
+        echo "   Make sure GOLOG_LOG_FMT=json is set for Curio"
+    fi
+fi
+
+# Step 4: Check if Vector is already installed
+echo
+if command -v vector &> /dev/null; then
+    VECTOR_VERSION=$(vector --version | head -1)
+    echo -e "${GREEN}✓${NC} Vector already installed: $VECTOR_VERSION"
+else
+    echo "Installing Vector..."
+    curl --proto '=https' --tlsv1.2 -sSfL https://sh.vector.dev | bash -s -- -y
+
+    if command -v vector &> /dev/null; then
+        echo -e "${GREEN}✓${NC} Vector installed successfully"
+    else
+        echo -e "${RED}Error: Vector installation failed${NC}"
+        exit 1
+    fi
+fi
+
+# Step 5: Download and configure Vector config
+echo
+echo "Configuring Vector..."
+curl -sSL "$REPO_URL/vector.yaml" -o /tmp/vector-warp-speed.yaml
+
+# Replace placeholders
+sed -i "s|YOUR_CLIENT_ID|$CLIENT_ID|g" /tmp/vector-warp-speed.yaml
+sed -i "s|YOUR_BETTER_STACK_TOKEN|$BETTER_STACK_TOKEN|g" /tmp/vector-warp-speed.yaml
+
+# Validate the config
+if vector validate /tmp/vector-warp-speed.yaml > /dev/null 2>&1; then
+    echo -e "${GREEN}✓${NC} Configuration validated"
+else
+    echo -e "${RED}Error: Invalid Vector configuration${NC}"
+    vector validate /tmp/vector-warp-speed.yaml
+    exit 1
+fi
+
+# Step 6: Install config
+sudo mv /tmp/vector-warp-speed.yaml /etc/vector/vector.yaml
+echo -e "${GREEN}✓${NC} Configuration installed"
+
+# Step 7: Enable and start Vector
+echo
+echo "Starting Vector..."
+sudo systemctl enable vector > /dev/null 2>&1
+sudo systemctl restart vector
+
+# Step 8: Wait for startup
+sleep 2
+
+# Step 9: Verify Vector is running
+if systemctl is-active --quiet vector; then
+    echo -e "${GREEN}✓${NC} Vector service is running"
+else
+    echo -e "${RED}Error: Vector failed to start${NC}"
+    echo "Check logs with: sudo journalctl -u vector -n 50"
+    exit 1
+fi
+
+# Step 10: Check for successful file detection
+if sudo journalctl -u vector --since "10 seconds ago" | grep -q "Found new file to watch"; then
+    echo -e "${GREEN}✓${NC} Vector found and is watching curio.log"
+elif sudo journalctl -u vector --since "10 seconds ago" | grep -q "Starting file server"; then
+    echo -e "${GREEN}✓${NC} Vector file server started"
+else
+    echo -e "${YELLOW}⚠${NC}  Could not confirm file watching (this might be okay)"
+fi
+
+# Step 11: Display success message
+echo
+echo "=========================================="
+echo -e "${GREEN}  Installation Complete!${NC}"
+echo "=========================================="
+echo
+echo "Your Curio PDP logs are now streaming to Better Stack"
+echo
+echo "Client ID: $CLIENT_ID"
+echo "Log file:  /var/log/curio/curio.log"
+echo
+echo "Verify it's working:"
+echo "  sudo systemctl status vector"
+echo "  sudo journalctl -u vector -f"
+echo
+echo "Logs will appear in Better Stack dashboard within ~1 minute"
+echo "Filter by: client_id:\"$CLIENT_ID\""
+echo
+echo "Questions? Contact the PDP maintainer"
+echo "=========================================="
