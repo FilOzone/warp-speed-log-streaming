@@ -2,7 +2,7 @@
 
 This guide helps you verify that log streaming is working correctly.
 
-**Note:** The installer supports both systemd service and manual deployments. The verification steps are the same for both, but manual deployments will have environment variables set in `~/.bashrc`.
+**Note:** The installer supports both systemd service and manual deployments. The verification steps are the same for both, but manual deployments will have environment variables set in `/etc/profile.d/curio-logging.sh`.
 
 ---
 
@@ -76,8 +76,8 @@ sudo systemctl show curio -p Environment
 
 **For manual deployments:**
 ```bash
-# Check bashrc has the environment variables
-grep GOLOG ~/.bashrc
+# Check profile.d has the environment variables
+cat /etc/profile.d/curio-logging.sh
 # Should show GOLOG_OUTPUT, GOLOG_FILE, and GOLOG_LOG_FMT
 ```
 
@@ -92,7 +92,7 @@ head -1 /var/log/curio/curio.log
 
 **If not JSON:**
 - For systemd: Check service file has `Environment=GOLOG_LOG_FMT="json"`
-- For manual: Check `~/.bashrc` has `export GOLOG_LOG_FMT="json"`
+- For manual: Check `/etc/profile.d/curio-logging.sh` has `export GOLOG_LOG_FMT="json"`
 - Restart Curio
 
 ### 4. Test Log Generation
@@ -326,7 +326,7 @@ vector --config /tmp/vector-test.yaml
 ```bash
 # Test connection to Better Stack
 curl -v -X POST https://s1560290.eu-nbg-2.betterstackdata.com/ \
-  -H "Authorization: Bearer LzoJaWSF4bbA4ic1JEeQ4TK7" \
+  -H "Authorization: Bearer YOUR_BETTER_STACK_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"message":"test"}'
 
@@ -367,7 +367,7 @@ sudo systemctl status vector > vector-status.txt
 sudo journalctl -u vector -n 100 > vector-logs.txt
 
 # 3. Config (redact token first!)
-sudo cat /etc/vector/vector.yaml | sed 's/LzoJaWSF4bbA4ic1JEeQ4TK7/REDACTED/' > vector-config.txt
+sudo cat /etc/vector/vector.yaml | sed 's/token:.*/token: REDACTED/' > vector-config.txt
 
 # 4. Permissions
 ls -ld /var/log/curio/ > permissions.txt

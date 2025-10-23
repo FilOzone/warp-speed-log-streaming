@@ -64,5 +64,9 @@ sinks:
       token: "YOUR_BETTER_STACK_TOKEN"
     inputs: ["curio_parser", "version_parser"]
     batch:
-      max_events: 100
-      timeout_secs: 1
+      max_events: 1000
+      timeout_secs: 10
+    buffer:
+      type: disk
+      max_size: 1 GiB
+      when_full: block

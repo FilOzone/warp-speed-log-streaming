@@ -144,11 +144,21 @@ fi
 # Step 5: Download and configure Vector config
 echo
 echo "Configuring Vector..."
-curl -sSL "$REPO_URL/vector.yaml" -o /tmp/vector-warp-speed.yaml
+if ! curl -sSL "$REPO_URL/vector.yaml" -o /tmp/vector-warp-speed.yaml; then
+    echo -e "${RED}Error: Failed to download Vector configuration${NC}"
+    exit 1
+fi
 
 # Replace placeholders
-sed -i "s|YOUR_CLIENT_ID|$CLIENT_ID|g" /tmp/vector-warp-speed.yaml
-sed -i "s|YOUR_BETTER_STACK_TOKEN|$BETTER_STACK_TOKEN|g" /tmp/vector-warp-speed.yaml
+if ! sed -i "s|YOUR_CLIENT_ID|$CLIENT_ID|g" /tmp/vector-warp-speed.yaml; then
+    echo -e "${RED}Error: Failed to configure client ID${NC}"
+    exit 1
+fi
+
+if ! sed -i "s|YOUR_BETTER_STACK_TOKEN|$BETTER_STACK_TOKEN|g" /tmp/vector-warp-speed.yaml; then
+    echo -e "${RED}Error: Failed to configure Better Stack token${NC}"
+    exit 1
+fi
 
 # Step 6: Install config
 sudo mv /tmp/vector-warp-speed.yaml /etc/vector/vector.yaml
