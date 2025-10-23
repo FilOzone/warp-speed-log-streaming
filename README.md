@@ -57,7 +57,7 @@ The installer:
 - **Bash shell** (required for installer)
 - **Curio** running (systemd service or manual)
 - **Sudo access** (for installing Vector and configuring systemd)
-- **Your client ID** from the [Filecoin Service Registry](https://github.com/filecoin-project/filecoin-service-registry)
+- **Your client ID** from the [Filecoin Service Registry](https://www.filecoin.services/providers)
 - **Better Stack token** (provided by maintainer)
 
 ### Deployment Methods
@@ -241,8 +241,8 @@ We take privacy seriously. The logging system:
 
 - **Better Stack Dashboard**: https://s1560290.eu-nbg-2.betterstackdata.com (access limited to working group/maintainers)
 - **Vector Docs**: https://vector.dev/docs/
-- **Curio PDP Docs**: https://docs.filecoin.io/storage-providers/pdp/
-- **Filecoin Service Registry**: https://github.com/filecoin-project/filecoin-service-registry
+- **Curio PDP Docs**: https://docs.curiostorage.org/experimental-features/enable-pdp
+- **Filecoin Service Registry**: https://www.filecoin.services/providers
 
 ---
 
