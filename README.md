@@ -11,14 +11,14 @@ Stream your Curio PDP logs to Better Stack for easy debugging, monitoring, and c
 **One command to rule them all:**
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/filecoin-project/warp-speed-log-streaming/main/install.sh | bash -s "your-client-id"
+curl -sSL https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/main/install.sh | bash -s "your-client-id"
 ```
 
 Replace `your-client-id` with your Filecoin Service Registry name (e.g., `ezpdpz-calib`).
 
 **Example:**
 ```bash
-curl -sSL https://raw.githubusercontent.com/filecoin-project/warp-speed-log-streaming/main/install.sh | bash -s "ezpdpz-calib"
+curl -sSL https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/main/install.sh | bash -s "ezpdpz-calib"
 ```
 
 **Time:** ~30-60 seconds
@@ -101,7 +101,7 @@ If you prefer to review before running:
 
 1. **Download and review the install script:**
    ```bash
-   curl -sSL https://raw.githubusercontent.com/filecoin-project/warp-speed-log-streaming/main/install.sh -o install.sh
+   curl -sSL https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/main/install.sh -o install.sh
    chmod +x install.sh
    cat install.sh  # Review it
    ```
@@ -223,7 +223,7 @@ Key settings:
 
 **Issues or questions?**
 
-- File an issue: [GitHub Issues](https://github.com/filecoin-project/warp-speed-log-streaming/issues)
+- File an issue: [GitHub Issues](https://github.com/FilOzone/warp-speed-log-streaming/issues)
 - Contact PDP maintainer with:
   - Your client ID
   - Output of `sudo systemctl status vector`

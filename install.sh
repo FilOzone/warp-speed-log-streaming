@@ -4,7 +4,7 @@ set -e
 # Warp Speed Log Streaming - Curio PDP to Better Stack
 # One-command installer for SP logging setup
 
-REPO_URL="https://raw.githubusercontent.com/filecoin-project/warp-speed-log-streaming/main"
+REPO_URL="https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/main"
 CLIENT_ID="$1"
 
 # Colors for output
