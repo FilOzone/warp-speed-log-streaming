@@ -8,6 +8,13 @@ sources:
     read_from: "end"
     include: ["/var/log/curio/curio.log"]
 
+  curio_version_heartbeat:
+    type: "exec"
+    mode: "scheduled"
+    command: ["sh", "-c", "curio --version 2>/dev/null"]
+    scheduled:
+      exec_interval_secs: 300  # Every 5 minutes
+
 transforms:
   curio_parser:
     type: "remap"
@@ -33,6 +40,17 @@ transforms:
 
       .platform = "Curio PDP"
 
+  version_parser:
+    type: "remap"
+    inputs: ["curio_version_heartbeat"]
+    source: |
+      .client_id = "YOUR_CLIENT_ID"
+      .platform = "Curio PDP"
+      .curio_version = string!(.message)
+      .dt = now()
+      del(.host)
+      del(.source_type)
+
 sinks:
   better_stack_logs:
     type: "http"
@@ -44,7 +62,7 @@ sinks:
     auth:
       strategy: "bearer"
       token: "YOUR_BETTER_STACK_TOKEN"
-    inputs: ["curio_parser"]
+    inputs: ["curio_parser", "version_parser"]
     batch:
       max_events: 100
       timeout_secs: 1
