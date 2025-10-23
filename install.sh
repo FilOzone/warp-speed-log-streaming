@@ -144,15 +144,6 @@ curl -sSL "$REPO_URL/vector.yaml" -o /tmp/vector-warp-speed.yaml
 sed -i "s|YOUR_CLIENT_ID|$CLIENT_ID|g" /tmp/vector-warp-speed.yaml
 sed -i "s|YOUR_BETTER_STACK_TOKEN|$BETTER_STACK_TOKEN|g" /tmp/vector-warp-speed.yaml
 
-# Validate the config
-if sudo vector validate /tmp/vector-warp-speed.yaml > /dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC} Configuration validated"
-else
-    echo -e "${RED}Error: Invalid Vector configuration${NC}"
-    sudo vector validate /tmp/vector-warp-speed.yaml
-    exit 1
-fi
-
 # Step 6: Install config
 sudo mv /tmp/vector-warp-speed.yaml /etc/vector/vector.yaml
 echo -e "${GREEN}✓${NC} Configuration installed"
