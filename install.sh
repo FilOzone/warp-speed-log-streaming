@@ -76,6 +76,7 @@ else
     fi
 
     # Check if environment variables are set in bashrc
+    ENV_VARS_ADDED=false
     if ! grep -q "GOLOG_OUTPUT.*file" ~/.bashrc 2>/dev/null; then
         echo
         echo "Adding log environment variables to ~/.bashrc..."
@@ -86,8 +87,7 @@ else
         echo "export GOLOG_LOG_FMT=\"json\"" >> ~/.bashrc
         source ~/.bashrc
         echo -e "${GREEN}✓${NC} Added environment variables to ~/.bashrc"
-        echo
-        echo -e "${YELLOW}⚠${NC}  IMPORTANT: You must restart Curio for logging changes to take effect"
+        ENV_VARS_ADDED=true
     else
         echo -e "${GREEN}✓${NC} Log environment variables already configured"
     fi
@@ -96,9 +96,16 @@ else
     if [ ! -f "$LOG_PATH" ]; then
         touch "$LOG_PATH"
         chmod 644 "$LOG_PATH"
-        echo -e "${GREEN}✓${NC} Created empty log file (will be populated when Curio starts)"
+        echo -e "${GREEN}✓${NC} Created empty log file: $LOG_PATH"
     else
         echo -e "${GREEN}✓${NC} Found existing curio.log"
+    fi
+
+    # Prompt user to restart Curio if we added env vars
+    if [ "$ENV_VARS_ADDED" = true ]; then
+        echo
+        echo -e "${YELLOW}⚠${NC}  IMPORTANT: Restart your Curio process now to enable logging"
+        echo "   The log file will be populated when Curio starts with the new environment variables"
     fi
 fi
 
@@ -116,15 +123,9 @@ if command -v vector &> /dev/null; then
     VECTOR_VERSION=$(vector --version | head -1)
     echo -e "${GREEN}✓${NC} Vector already installed: $VECTOR_VERSION"
 else
-    echo "Installing Vector..."
-    curl --proto '=https' --tlsv1.2 -sSfL https://sh.vector.dev | bash -s -- -y
-
-    # Source profile to get vector in PATH
-    if [ -f "$HOME/.profile" ]; then
-        source "$HOME/.profile"
-    elif [ -f "$HOME/.zprofile" ]; then
-        source "$HOME/.zprofile"
-    fi
+    echo "Installing Vector via Better Stack..."
+    curl -sSL https://telemetry.betterstack.com/setup-vector/ubuntu/$BETTER_STACK_TOKEN -o /tmp/setup-vector.sh
+    bash /tmp/setup-vector.sh
 
     if command -v vector &> /dev/null; then
         echo -e "${GREEN}✓${NC} Vector installed successfully"
