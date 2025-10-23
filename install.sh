@@ -84,11 +84,10 @@ else
         echo "export GOLOG_OUTPUT=\"file+stdout\"" >> ~/.bashrc
         echo "export GOLOG_FILE=\"/var/log/curio/curio.log\"" >> ~/.bashrc
         echo "export GOLOG_LOG_FMT=\"json\"" >> ~/.bashrc
+        source ~/.bashrc
         echo -e "${GREEN}✓${NC} Added environment variables to ~/.bashrc"
         echo
-        echo -e "${YELLOW}⚠${NC}  IMPORTANT: You must restart Curio for logging changes to take effect:"
-        echo "   source ~/.bashrc"
-        echo "   Then restart your Curio process"
+        echo -e "${YELLOW}⚠${NC}  IMPORTANT: You must restart Curio for logging changes to take effect"
     else
         echo -e "${GREEN}✓${NC} Log environment variables already configured"
     fi
@@ -119,6 +118,13 @@ if command -v vector &> /dev/null; then
 else
     echo "Installing Vector..."
     curl --proto '=https' --tlsv1.2 -sSfL https://sh.vector.dev | bash -s -- -y
+
+    # Source profile to get vector in PATH
+    if [ -f "$HOME/.profile" ]; then
+        source "$HOME/.profile"
+    elif [ -f "$HOME/.zprofile" ]; then
+        source "$HOME/.zprofile"
+    fi
 
     if command -v vector &> /dev/null; then
         echo -e "${GREEN}✓${NC} Vector installed successfully"
