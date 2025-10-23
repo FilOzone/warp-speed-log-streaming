@@ -5,7 +5,6 @@ set -e
 # One-command installer for SP logging setup
 
 REPO_URL="https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/main"
-CLIENT_ID="$1"
 
 # Colors for output
 RED='\033[0;31m'
@@ -17,17 +16,13 @@ echo "=========================================="
 echo "  Warp Speed Log Streaming Installer"
 echo "  Curio PDP → Better Stack"
 echo "=========================================="
-echo
 
-# Step 1: Validate input
+# Step 1: Get client ID
+echo
+read -p "Enter your client ID (from Filecoin Service Registry): " CLIENT_ID < /dev/tty
+
 if [ -z "$CLIENT_ID" ]; then
     echo -e "${RED}Error: Client ID required${NC}"
-    echo
-    echo "Usage:"
-    echo "  curl -sSL $REPO_URL/install.sh | bash -s \"your-client-id\""
-    echo
-    echo "Example:"
-    echo "  curl -sSL $REPO_URL/install.sh | bash -s \"ezpdpz-calib\""
     exit 1
 fi
 
@@ -104,7 +99,10 @@ else
     # Prompt user to restart Curio if we added env vars
     if [ "$ENV_VARS_ADDED" = true ]; then
         echo
-        echo -e "${YELLOW}⚠${NC}  IMPORTANT: Restart your Curio process now to enable logging"
+        echo -e "${YELLOW}⚠${NC}  IMPORTANT: Restart your Curio process to enable logging"
+        echo "   1. Stop your current Curio process"
+        echo "   2. Source the updated environment: source ~/.bashrc"
+        echo "   3. Start Curio again"
         echo "   The log file will be populated when Curio starts with the new environment variables"
     fi
 fi

@@ -11,15 +11,12 @@ Stream your Curio PDP logs to Better Stack for easy debugging, monitoring, and c
 **One command to rule them all:**
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/main/install.sh | bash -s "your-client-id"
+curl -sSL https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/main/install.sh | bash
 ```
 
-Replace `your-client-id` with your Filecoin Service Registry name (e.g., `ezpdpz-calib`).
-
-**Example:**
-```bash
-curl -sSL https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/main/install.sh | bash -s "ezpdpz-calib"
-```
+The installer will prompt you for:
+- Your client ID (from Filecoin Service Registry, e.g., `ezpdpz-calib`)
+- Better Stack token (provided by maintainer)
 
 **Time:** ~30-60 seconds
 
@@ -28,7 +25,7 @@ curl -sSL https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/ma
 ## What It Does
 
 The installer:
-1. ✓ Validates your client ID
+1. ✓ Prompts for your client ID
 2. ✓ Prompts for Better Stack token
 3. ✓ Detects your deployment method (systemd vs manual)
 4. ✓ Sets up logging configuration (if manual)
@@ -108,8 +105,10 @@ If you prefer to review before running:
 
 2. **Run it:**
    ```bash
-   ./install.sh "your-client-id"
+   ./install.sh
    ```
+
+   The script will prompt you for your client ID and Better Stack token.
 
 ---
 
