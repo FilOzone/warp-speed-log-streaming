@@ -14,6 +14,14 @@ This logging infrastructure is set up to help maintainers and core team debug is
 
 ---
 
+## Getting Started
+
+### Obtaining the Better Stack Token
+
+Contact the FilOz team in the **#fil-pdp** channel on Filecoin Slack to receive your Better Stack token. This token is shared among all Warp Speed participants and should not be publicly shared.
+
+---
+
 ## Quick Start
 
 **One command to rule them all:**
@@ -71,12 +79,12 @@ The installer will detect the systemd service and verify the log file exists.
 
 If running Curio manually (not as systemd), the installer will:
 - Create `/var/log/curio/` directory
-- Add environment variables to `~/.bashrc`:
+- Add environment variables to `/etc/profile.d/curio-logging.sh` (shell-agnostic):
   - `GOLOG_OUTPUT="file+stdout"` (logs to both file and terminal)
   - `GOLOG_FILE="/var/log/curio/curio.log"`
   - `GOLOG_LOG_FMT="json"`
 
-You'll need to restart Curio after installation for the changes to take effect.
+You'll need to source the configuration (`source /etc/profile.d/curio-logging.sh` or start a new shell) and restart Curio for the changes to take effect.
 
 ---
 

@@ -70,18 +70,19 @@ else
         echo -e "${GREEN}✓${NC} Created /var/log/curio"
     fi
 
-    # Check if environment variables are set in bashrc
+    # Check if environment variables are set in profile.d
     ENV_VARS_ADDED=false
-    if ! grep -q "GOLOG_OUTPUT.*file" ~/.bashrc 2>/dev/null; then
+    if [ ! -f "/etc/profile.d/curio-logging.sh" ]; then
         echo
-        echo "Adding log environment variables to ~/.bashrc..."
-        echo "" >> ~/.bashrc
-        echo "# Curio logging configuration (added by warp-speed-log-streaming)" >> ~/.bashrc
-        echo "export GOLOG_OUTPUT=\"file+stdout\"" >> ~/.bashrc
-        echo "export GOLOG_FILE=\"/var/log/curio/curio.log\"" >> ~/.bashrc
-        echo "export GOLOG_LOG_FMT=\"json\"" >> ~/.bashrc
-        source ~/.bashrc
-        echo -e "${GREEN}✓${NC} Added environment variables to ~/.bashrc"
+        echo "Adding log environment variables to /etc/profile.d/curio-logging.sh..."
+        sudo bash -c 'cat > /etc/profile.d/curio-logging.sh <<EOF
+# Curio logging configuration (added by warp-speed-log-streaming)
+export GOLOG_OUTPUT="file+stdout"
+export GOLOG_FILE="/var/log/curio/curio.log"
+export GOLOG_LOG_FMT="json"
+EOF'
+        source /etc/profile.d/curio-logging.sh
+        echo -e "${GREEN}✓${NC} Added environment variables to /etc/profile.d/curio-logging.sh"
         ENV_VARS_ADDED=true
     else
         echo -e "${GREEN}✓${NC} Log environment variables already configured"
@@ -101,7 +102,8 @@ else
         echo
         echo -e "${YELLOW}⚠${NC}  IMPORTANT: Restart your Curio process to enable logging"
         echo "   1. Stop your current Curio process"
-        echo "   2. Source the updated environment: source ~/.bashrc"
+        echo "   2. Source the updated environment: source /etc/profile.d/curio-logging.sh"
+        echo "      (or start a new shell session)"
         echo "   3. Start Curio again"
         echo "   The log file will be populated when Curio starts with the new environment variables"
     fi
