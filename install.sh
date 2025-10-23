@@ -145,11 +145,11 @@ sed -i "s|YOUR_CLIENT_ID|$CLIENT_ID|g" /tmp/vector-warp-speed.yaml
 sed -i "s|YOUR_BETTER_STACK_TOKEN|$BETTER_STACK_TOKEN|g" /tmp/vector-warp-speed.yaml
 
 # Validate the config
-if vector validate /tmp/vector-warp-speed.yaml > /dev/null 2>&1; then
+if sudo vector validate /tmp/vector-warp-speed.yaml > /dev/null 2>&1; then
     echo -e "${GREEN}✓${NC} Configuration validated"
 else
     echo -e "${RED}Error: Invalid Vector configuration${NC}"
-    vector validate /tmp/vector-warp-speed.yaml
+    sudo vector validate /tmp/vector-warp-speed.yaml
     exit 1
 fi
 
