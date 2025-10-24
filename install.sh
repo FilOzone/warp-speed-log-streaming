@@ -19,7 +19,7 @@ echo "=========================================="
 
 # Step 1: Get client ID
 echo
-read -p "Enter your client ID (from Filecoin Service Registry): " CLIENT_ID < /dev/tty
+read -p "Enter your PDP node name (e.g. ezpdpz-calib): " CLIENT_ID < /dev/tty
 
 if [ -z "$CLIENT_ID" ]; then
     echo -e "${RED}Error: Client ID required${NC}"
@@ -97,16 +97,6 @@ EOF'
         echo -e "${GREEN}✓${NC} Found existing curio.log"
     fi
 
-    # Prompt user to restart Curio if we added env vars
-    if [ "$ENV_VARS_ADDED" = true ]; then
-        echo
-        echo -e "${YELLOW}⚠${NC}  IMPORTANT: Restart your Curio process to enable logging"
-        echo "   1. Stop your current Curio process"
-        echo "   2. Source the updated environment: source /etc/profile.d/curio-logging.sh"
-        echo "      (or start a new shell session)"
-        echo "   3. Start Curio again"
-        echo "   The log file will be populated when Curio starts with the new environment variables"
-    fi
 fi
 
 # Verify log format if file has content
@@ -202,12 +192,24 @@ echo
 echo "Client ID: $CLIENT_ID"
 echo "Log file:  /var/log/curio/curio.log"
 echo
-echo "Verify it's working:"
-echo "  sudo systemctl status vector"
-echo "  sudo journalctl -u vector -f"
-echo
-echo "Logs will appear in Better Stack dashboard within ~1 minute"
-echo "Filter by: client_id:\"$CLIENT_ID\""
-echo
-echo "Questions? Contact the PDP maintainer"
-echo "=========================================="
+echo "Questions? Contact the FilOz Team in #fil-warp-speed"
+
+# Display restart warning for manual deployments
+if [ "$ENV_VARS_ADDED" = true ]; then
+    echo
+    echo "=========================================="
+    echo -e "${RED}⚠  ACTION REQUIRED${NC}"
+    echo "=========================================="
+    echo
+    echo "You must restart your Curio process to enable logging:"
+    echo
+    echo "  1. Stop your current Curio process"
+    echo "  2. Source the environment: source /etc/profile.d/curio-logging.sh"
+    echo "     (or start a new shell session)"
+    echo "  3. Start Curio again"
+    echo
+    echo "Logs will only stream after Curio is restarted with the new configuration"
+    echo "=========================================="
+else
+    echo "=========================================="
+fi
