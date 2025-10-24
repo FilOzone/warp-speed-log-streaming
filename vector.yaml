@@ -21,24 +21,30 @@ transforms:
     inputs: ["curio_logs"]
     source: |
       .client_id = "YOUR_CLIENT_ID"
+      .platform = "Curio PDP"
+
+      # Remove fields that reveal unneeded SP info.
       del(.source_type)
       del(.host)
       del(.file)
 
-      # Parse JSON from message field
+      # Parse JSON from message field and inline it
       parsed, err = parse_json(.message)
       if err == null {
         . = merge!(., parsed)
+        # Remove original message field since the fields have been inlined
+        del(.message)
       }
 
-      # Set dt from ts field or timestamp
-      if exists(.ts) {
-        .dt = .ts
-      } else {
+      # Set dt, which is required for BetterStack.
+      # Priority is given to .ts over .timestamp.
+      # They are then removed to avoid duplication/clutter.
+      if exists(.timestamp) {
         .dt = del(.timestamp)
       }
-
-      .platform = "Curio PDP"
+      if exists(.ts) {
+        .dt = del(.ts)
+      }
 
   version_parser:
     type: "remap"
