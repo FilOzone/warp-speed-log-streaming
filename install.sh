@@ -113,15 +113,12 @@ if command -v vector &> /dev/null; then
     VECTOR_VERSION=$(vector --version | head -1)
     echo -e "${GREEN}✓${NC} Vector already installed: $VECTOR_VERSION"
 else
-    echo "Installing Vector..."
-    curl --proto '=https' --tlsv1.2 -sSfL https://sh.vector.dev | bash -s -- -y
+    echo "Installing Vector via Better Stack..."
 
-    # Source profile to get vector in PATH
-    if [ -f "$HOME/.profile" ]; then
-        source "$HOME/.profile"
-    elif [ -f "$HOME/.zprofile" ]; then
-        source "$HOME/.zprofile"
-    fi
+    # Download and run Better Stack's Vector installer
+    curl -sSL https://telemetry.betterstack.com/setup-vector/ubuntu/$BETTER_STACK_TOKEN \
+      -o /tmp/setup-vector.sh
+    bash /tmp/setup-vector.sh
 
     if command -v vector &> /dev/null; then
         echo -e "${GREEN}✓${NC} Vector installed successfully"
