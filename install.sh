@@ -107,25 +107,36 @@ if [ -f "$LOG_PATH" ] && [ -s "$LOG_PATH" ]; then
     fi
 fi
 
-# Step 4: Check if Vector is already installed
+# Step 4: Clean install of Vector
 echo
-if command -v vector &> /dev/null; then
-    VECTOR_VERSION=$(vector --version | head -1)
-    echo -e "${GREEN}✓${NC} Vector already installed: $VECTOR_VERSION"
+echo "Ensuring clean Vector installation..."
+
+# Stop vector service if running
+sudo systemctl stop vector 2>/dev/null || true
+
+# Remove any existing Vector installations
+sudo apt-get purge -y vector 2>/dev/null || true
+rm -rf ~/.vector 2>/dev/null || true
+
+# Remove Vector from shell configs
+sed -i '/\.vector\/bin/d' ~/.bashrc ~/.profile 2>/dev/null || true
+
+echo "Installing Vector via Better Stack..."
+
+# Download and run Better Stack's Vector installer
+curl -sSL https://telemetry.betterstack.com/setup-vector/ubuntu/$BETTER_STACK_TOKEN \
+  -o /tmp/setup-vector.sh
+
+# Set non-interactive mode for package installations (prevents prompts on Ubuntu/Debian)
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+bash /tmp/setup-vector.sh
+
+if command -v vector &> /dev/null && [ -d "/etc/vector" ]; then
+    echo -e "${GREEN}✓${NC} Vector installed successfully"
 else
-    echo "Installing Vector via Better Stack..."
-
-    # Download and run Better Stack's Vector installer
-    curl -sSL https://telemetry.betterstack.com/setup-vector/ubuntu/$BETTER_STACK_TOKEN \
-      -o /tmp/setup-vector.sh
-    bash /tmp/setup-vector.sh
-
-    if command -v vector &> /dev/null; then
-        echo -e "${GREEN}✓${NC} Vector installed successfully"
-    else
-        echo -e "${RED}Error: Vector installation failed${NC}"
-        exit 1
-    fi
+    echo -e "${RED}Error: Vector installation failed${NC}"
+    exit 1
 fi
 
 # Step 5: Download and configure Vector config
