@@ -123,15 +123,12 @@ sed -i '/\.vector\/bin/d' ~/.bashrc ~/.profile 2>/dev/null || true
 
 echo "Installing Vector via Better Stack..."
 
-# Download Better Stack's Vector installer
+# Download and run Better Stack's Vector installer
 curl -sSL https://telemetry.betterstack.com/setup-vector/ubuntu/$BETTER_STACK_TOKEN \
   -o /tmp/setup-vector.sh
 
-# Modify script to run apt non-interactively (prevents needrestart dialog)
-sed -i 's/sudo apt-get/sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a NEEDRESTART_SUSPEND=1 apt-get/g' /tmp/setup-vector.sh
-sed -i 's/sudo yum/sudo yum -y/g' /tmp/setup-vector.sh
-
-bash /tmp/setup-vector.sh
+# Run non-interactively (prevents needrestart dialog on Ubuntu/Debian)
+sudo NEEDRESTART_MODE=a DEBIAN_FRONTEND=noninteractive bash /tmp/setup-vector.sh
 
 if command -v vector &> /dev/null && [ -d "/etc/vector" ]; then
     echo -e "${GREEN}✓${NC} Vector installed successfully"
