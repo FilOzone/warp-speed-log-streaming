@@ -130,7 +130,10 @@ curl -sSL https://telemetry.betterstack.com/setup-vector/ubuntu/$BETTER_STACK_TO
 # Temporarily disable needrestart prompts (Ubuntu/Debian only, harmless on other distros)
 if [ -d "/etc/needrestart" ]; then
     sudo mkdir -p /etc/needrestart/conf.d
-    echo "\$nrconf{restart} = 'a';" | sudo tee /etc/needrestart/conf.d/50-local.conf > /dev/null
+    sudo bash -c 'cat > /etc/needrestart/conf.d/50-local.conf <<EOF
+\$nrconf{restart} = '"'"'a'"'"';
+\$nrconf{kernelhints} = 0;
+EOF'
 fi
 
 # Run installer
