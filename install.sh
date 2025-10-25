@@ -123,24 +123,12 @@ sed -i '/\.vector\/bin/d' ~/.bashrc ~/.profile 2>/dev/null || true
 
 echo "Installing Vector via Better Stack..."
 
-# Download Better Stack's Vector installer
+# Download and run Better Stack's Vector installer
 curl -sSL https://telemetry.betterstack.com/setup-vector/ubuntu/$BETTER_STACK_TOKEN \
   -o /tmp/setup-vector.sh
 
-# Temporarily disable needrestart prompts (Ubuntu/Debian only, harmless on other distros)
-if [ -d "/etc/needrestart" ]; then
-    sudo mkdir -p /etc/needrestart/conf.d
-    sudo bash -c 'cat > /etc/needrestart/conf.d/50-local.conf <<EOF
-\$nrconf{restart} = '"'"'a'"'"';
-\$nrconf{kernelhints} = 0;
-EOF'
-fi
-
-# Run installer
-bash /tmp/setup-vector.sh
-
-# Remove temporary config
-sudo rm -f /etc/needrestart/conf.d/50-local.conf 2>/dev/null || true
+# Run installer with stdin closed to prevent any interactive prompts
+bash /tmp/setup-vector.sh < /dev/null
 
 if command -v vector &> /dev/null && [ -d "/etc/vector" ]; then
     echo -e "${GREEN}✓${NC} Vector installed successfully"
