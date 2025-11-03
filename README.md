@@ -16,14 +16,23 @@ This logging infrastructure is set up to help maintainers and the core filecoin 
 
 ## Prerequisites
 
+### Linux
 - **Better Stack token** - Contact the FilOz team in the **#fil-pdp** channel on Filecoin Slack to receive your Better Stack token. This token is shared among all Warp Speed participants and should not be publicly shared.
 - **Bash shell** (required for installer)
 - **Curio** running (systemd service or manual)
 - **Sudo access** (for installing Vector and configuring systemd)
 - **Your client ID** from the [Filecoin Service Registry](https://www.filecoin.services/providers)
 
+### macOS
+- **Better Stack token** - Contact the FilOz team in the **#fil-pdp** channel on Filecoin Slack
+- **Homebrew** - [Install Homebrew](https://brew.sh) if not already installed
+- **Curio** running (launchd service or manual)
+- **Your client ID** from the [Filecoin Service Registry](https://www.filecoin.services/providers)
+
 
 ## Install
+
+### Linux
 
 **One command to rule them all:**
 
@@ -36,6 +45,26 @@ The installer will prompt you for:
 - Better Stack token (provided by maintainer)
 
 **Time:** ~30-60 seconds
+
+### macOS
+
+**One command for Mac users:**
+
+```bash
+curl -sSL https://raw.githubusercontent.com/FilOzone/warp-speed-log-streaming/main/install-mac.sh | bash
+```
+
+The installer will prompt you for:
+- Your client ID (from Filecoin Service Registry, e.g., `YOUR_CLIENT_ID="ezpdpz-calib"`)
+- Better Stack token (provided by maintainer)
+
+**Features:**
+- Auto-detects Intel vs Apple Silicon architecture
+- Uses Homebrew for Vector installation
+- Configures environment variables in your shell config (`~/.zshrc` or `~/.bashrc`)
+- Supports both launchd services and manual Curio deployments
+
+**Time:** ~1-2 minutes
 
 ---
 
@@ -82,6 +111,8 @@ You'll need to source the configuration (`source /etc/profile.d/curio-logging.sh
 
 ## Verification
 
+### Linux
+
 After installation, verify it's working:
 
 ```bash
@@ -99,11 +130,32 @@ Logs appear in the Better Stack dashboard within ~1 minute.
 
 Filter by your client ID: `client_id:"$YOUR_CLIENT_ID"`
 
+### macOS
+
+After installation, verify it's working:
+
+```bash
+# Check Vector status
+brew services list | grep vector
+
+# Check if Vector is watching your log file
+lsof -p $(pgrep vector) | grep curio
+
+# View recent Vector logs (macOS 10.12+)
+log show --predicate 'process == "vector"' --last 1m --style compact
+```
+
+Logs appear in the Better Stack dashboard within ~1 minute.
+
+Filter by your client ID: `client_id:"$YOUR_CLIENT_ID"`
+
 ---
 
 ## Troubleshooting
 
-### Vector not starting
+### Linux
+
+#### Vector not starting
 
 ```bash
 # Check for config errors
@@ -113,7 +165,7 @@ sudo vector validate --config /etc/vector/vector.yaml
 sudo journalctl -u vector -n 50
 ```
 
-### No logs appearing in Better Stack
+#### No logs appearing in Better Stack
 
 **Wait 1-2 minutes** - Batching means logs are sent in groups
 
@@ -130,7 +182,7 @@ sudo chmod 644 /var/log/curio/curio.log
 sudo systemctl restart vector
 ```
 
-### Permission denied errors
+#### Permission denied errors
 
 ```bash
 # Check log directory permissions
@@ -146,16 +198,78 @@ sudo chmod 644 /var/log/curio/curio.log
 sudo systemctl restart vector
 ```
 
+### macOS
+
+#### Vector not starting
+
+```bash
+# Check Vector service status
+brew services list | grep vector
+
+# Validate config (Intel Mac)
+vector validate --config /usr/local/etc/vector/vector.yaml
+
+# Validate config (Apple Silicon Mac)
+vector validate --config /opt/homebrew/etc/vector/vector.yaml
+
+# Restart Vector
+brew services restart vector
+```
+
+#### No logs appearing in Better Stack
+
+**Wait 1-2 minutes** - Batching means logs are sent in groups
+
+**Check if Vector is reading the file:**
+```bash
+lsof -p $(pgrep vector) | grep curio.log
+```
+
+If the file is NOT open, check log path matches your architecture:
+```bash
+# Intel Mac: /usr/local/var/log/curio/curio.log
+# Apple Silicon: /opt/homebrew/var/log/curio/curio.log
+
+# Verify log file exists and has content
+ls -la /usr/local/var/log/curio/curio.log  # Intel
+ls -la /opt/homebrew/var/log/curio/curio.log  # Apple Silicon
+```
+
+#### Curio not logging
+
+For manual Curio deployments, ensure you've:
+1. Restarted your terminal or sourced the shell config:
+   ```bash
+   source ~/.zshrc  # or ~/.bashrc
+   ```
+2. Restarted Curio process
+3. Verify environment variables are set:
+   ```bash
+   echo $GOLOG_FILE
+   echo $GOLOG_LOG_FMT
+   ```
+
 ---
 
 ## Uninstall
+
+### Linux
 
 To remove Vector and stop log streaming:
 
 ```bash
 sudo systemctl stop vector
 sudo systemctl disable vector
-sudo apt remove vector  # or: brew uninstall vector
+sudo apt remove vector
+```
+
+### macOS
+
+To remove Vector and stop log streaming:
+
+```bash
+brew services stop vector
+brew uninstall vector
 ```
 
 ---
