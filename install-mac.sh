@@ -132,6 +132,7 @@ else
 export GOLOG_OUTPUT="file+stdout"
 export GOLOG_FILE="$LOG_PATH"
 export GOLOG_LOG_FMT="json"
+export GOLOG_LOG_LEVEL="debug"
 EOF
         echo -e "${GREEN}✓${NC} Added environment variables to $SHELL_RC"
         ENV_VARS_ADDED=true
@@ -143,6 +144,7 @@ EOF
     export GOLOG_OUTPUT="file+stdout"
     export GOLOG_FILE="$LOG_PATH"
     export GOLOG_LOG_FMT="json"
+    export GOLOG_LOG_LEVEL="debug"
 
     # Create empty log file if it doesn't exist
     if [ ! -f "$LOG_PATH" ]; then

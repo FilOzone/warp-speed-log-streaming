@@ -80,6 +80,7 @@ else
 export GOLOG_OUTPUT="file+stdout"
 export GOLOG_FILE="/var/log/curio/curio.log"
 export GOLOG_LOG_FMT="json"
+export GOLOG_LOG_LEVEL="debug"
 EOF'
         source /etc/profile.d/curio-logging.sh
         echo -e "${GREEN}✓${NC} Added environment variables to /etc/profile.d/curio-logging.sh"
