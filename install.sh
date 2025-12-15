@@ -70,24 +70,20 @@ else
         echo -e "${GREEN}✓${NC} Created /var/log/curio"
     fi
 
-    # Check if environment variables are set in profile.d
+    # Always write environment variables (overwrites any existing config)
     ENV_VARS_ADDED=false
-    if [ ! -f "/etc/profile.d/curio-logging.sh" ]; then
-        echo
-        echo "Adding log environment variables to /etc/profile.d/curio-logging.sh..."
-        sudo bash -c 'cat > /etc/profile.d/curio-logging.sh <<EOF
+    echo
+    echo "Configuring log environment variables in /etc/profile.d/curio-logging.sh..."
+    sudo bash -c 'cat > /etc/profile.d/curio-logging.sh <<EOF
 # Curio logging configuration (added by warp-speed-log-streaming)
 export GOLOG_OUTPUT="file+stdout"
 export GOLOG_FILE="/var/log/curio/curio.log"
 export GOLOG_LOG_FMT="json"
 export GOLOG_LOG_LEVEL="debug"
 EOF'
-        source /etc/profile.d/curio-logging.sh
-        echo -e "${GREEN}✓${NC} Added environment variables to /etc/profile.d/curio-logging.sh"
-        ENV_VARS_ADDED=true
-    else
-        echo -e "${GREEN}✓${NC} Log environment variables already configured"
-    fi
+    source /etc/profile.d/curio-logging.sh
+    echo -e "${GREEN}✓${NC} Configured environment variables in /etc/profile.d/curio-logging.sh"
+    ENV_VARS_ADDED=true
 
     # Create empty log file if it doesn't exist
     if [ ! -f "$LOG_PATH" ]; then

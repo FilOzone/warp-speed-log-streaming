@@ -122,11 +122,13 @@ else
         SHELL_RC="$HOME/.profile"
     fi
 
-    # Check if environment variables are already configured
-    if ! grep -q "GOLOG_FILE.*curio" "$SHELL_RC" 2>/dev/null; then
-        echo
-        echo "Adding log environment variables to $SHELL_RC..."
-        cat >> "$SHELL_RC" <<EOF
+    # Remove any existing curio logging config and add fresh config
+    echo
+    echo "Configuring log environment variables in $SHELL_RC..."
+    # Remove old config block if it exists
+    sed -i.bak '/# Curio logging configuration/,/GOLOG_LOG_LEVEL/d' "$SHELL_RC" 2>/dev/null || true
+    # Add fresh config
+    cat >> "$SHELL_RC" <<EOF
 
 # Curio logging configuration (added by warp-speed-log-streaming)
 export GOLOG_OUTPUT="file+stdout"
@@ -134,11 +136,8 @@ export GOLOG_FILE="$LOG_PATH"
 export GOLOG_LOG_FMT="json"
 export GOLOG_LOG_LEVEL="debug"
 EOF
-        echo -e "${GREEN}✓${NC} Added environment variables to $SHELL_RC"
-        ENV_VARS_ADDED=true
-    else
-        echo -e "${GREEN}✓${NC} Log environment variables already configured in $SHELL_RC"
-    fi
+    echo -e "${GREEN}✓${NC} Configured environment variables in $SHELL_RC"
+    ENV_VARS_ADDED=true
 
     # Source the configuration in current shell
     export GOLOG_OUTPUT="file+stdout"
